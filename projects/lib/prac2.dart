@@ -12,26 +12,7 @@ class _Prac2State extends State<Prac2> {
   String _result = '';
   String _selectedConversion = 'Fahrenheit';
 
-  void _convertTemperature() {
-    double? input = double.tryParse(_controller.text);
-    if (input != null) {
-      setState(() {
-        if (_selectedConversion == 'Fahrenheit') {
-          double fahrenheit = (input * 9 / 5) + 32;
-          _result = '$input°C = ${fahrenheit.toStringAsFixed(2)}°F';
-        } else if (_selectedConversion == 'Kelvin') {
-          double kelvin = input + 273.15;
-          _result = '$input°C = ${kelvin.toStringAsFixed(2)}K';
-        } else {
-          _result = '$input°C = $input°C';
-        }
-      });
-    } else {
-      setState(() {
-        _result = 'Invalid input';
-      });
-    }
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -87,6 +68,26 @@ class _Prac2State extends State<Prac2> {
         ),
       ),
     );
+  }
+  void _convertTemperature() {
+    double? input = double.tryParse(_controller.text);
+    if (input != null) {
+      setState(() {
+        if (_selectedConversion == 'Fahrenheit') {
+          double fahrenheit = (input * 9 / 5) + 32;
+          _result = '$input°C = ${fahrenheit.toStringAsFixed(2)}°F';
+        } else if (_selectedConversion == 'Kelvin') {
+          double kelvin = input + 273.15;
+          _result = '$input°C = ${kelvin.toStringAsFixed(2)}K';
+        } else {
+          _result = '$input°C = $input°C';
+        }
+      });
+    } else {
+      setState(() {
+        _result = 'Invalid input';
+      });
+    }
   }
 }
 
