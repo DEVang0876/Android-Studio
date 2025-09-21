@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class Prac5 extends StatefulWidget {
   const Prac5({super.key});
@@ -19,8 +18,6 @@ class _Prac5State extends State<Prac5> {
   @override
   void initState() {
     super.initState();
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
     initDatabase();
   }
 
@@ -53,6 +50,16 @@ class _Prac5State extends State<Prac5> {
     fetchStudents();
   }
 
+  Future<void> updateStudent(int id, String name, int age) async {
+    await database.update(
+      'students',
+      {'name': name, 'age': age},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    fetchStudents();
+  }
+
   Future<void> deleteStudent(int id) async {
     await database.delete(
       'students',
@@ -60,6 +67,64 @@ class _Prac5State extends State<Prac5> {
       whereArgs: [id],
     );
     fetchStudents();
+  }
+
+  void showUpdateDialog(int id, String currentName, int currentAge) {
+    nameController.text = currentName;
+    ageController.text = currentAge.toString();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Update Student'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: ageController,
+                decoration: InputDecoration(
+                  labelText: 'Age',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                String name = nameController.text;
+                String ageText = ageController.text;
+                if (name.isNotEmpty && int.tryParse(ageText) != null) {
+                  updateStudent(id, name, int.parse(ageText));
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Invalid name or age')),
+                  );
+                }
+              },
+              child: Text('Update'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -111,6 +176,11 @@ class _Prac5State extends State<Prac5> {
                     child: ListTile(
                       title: Text(students[index]['name']),
                       subtitle: Text('Age: ${students[index]['age']}'),
+                      onLongPress: () => showUpdateDialog(
+                        students[index]['id'],
+                        students[index]['name'],
+                        students[index]['age'],
+                      ),
                       trailing: IconButton(
                         icon: Icon(Icons.delete, color: Colors.red),
                         onPressed: () => deleteStudent(students[index]['id']),
