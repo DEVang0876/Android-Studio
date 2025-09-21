@@ -74,7 +74,7 @@ class _Prac5State extends State<Prac5> {
     ageController.text = currentAge.toString();
 
     showDialog(
-      context: context,
+      context: this.context, // Corrected to use the proper BuildContext
       builder: (context) {
         return AlertDialog(
           title: Text('Update Student'),
@@ -114,7 +114,7 @@ class _Prac5State extends State<Prac5> {
                   updateStudent(id, name, int.parse(ageText));
                   Navigator.pop(context);
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(this.context).showSnackBar(
                     SnackBar(content: Text('Invalid name or age')),
                   );
                 }
