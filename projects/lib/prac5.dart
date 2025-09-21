@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class Prac5 extends StatefulWidget {
   const Prac5({super.key});
@@ -18,6 +19,8 @@ class _Prac5State extends State<Prac5> {
   @override
   void initState() {
     super.initState();
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
     initDatabase();
   }
 
@@ -74,7 +77,7 @@ class _Prac5State extends State<Prac5> {
     ageController.text = currentAge.toString();
 
     showDialog(
-      context: this.context, // Corrected to use the proper BuildContext
+      context: context,
       builder: (context) {
         return AlertDialog(
           title: Text('Update Student'),
@@ -114,7 +117,7 @@ class _Prac5State extends State<Prac5> {
                   updateStudent(id, name, int.parse(ageText));
                   Navigator.pop(context);
                 } else {
-                  ScaffoldMessenger.of(this.context).showSnackBar(
+                  ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Invalid name or age')),
                   );
                 }
