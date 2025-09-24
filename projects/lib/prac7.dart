@@ -1,30 +1,55 @@
 import 'package:flutter/material.dart';
 
-class Prac7 extends StatefulWidget {
+class Prac7 extends StatelessWidget {
   const Prac7({super.key});
 
   @override
-  State<Prac7> createState() => _Prac7State();
-}
-class _Prac7State  extends State<Prac7>
-{
-  List tasks = [];
-  TextEditingController task_input = TextEditingController();
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          title: Text("Prac7")
-      ),body:
-    Column(
-      children: [
-      ],
-    ),
-
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Product Catalog'),
+          backgroundColor: Colors.blueAccent,
+        ),
+        body: GridView.builder(
+          padding: const EdgeInsets.all(8.0),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 8.0,
+            mainAxisSpacing: 8.0,
+          ),
+          itemCount: 6,
+          itemBuilder: (context, index) {
+            return Card(
+              elevation: 4,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Image.asset(
+                      'assets/image${index + 1}.jpeg',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Product ${index + 1}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
-
-  
 }
 
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class Prac5 extends StatefulWidget {
   const Prac5({super.key});
@@ -11,7 +10,7 @@ class Prac5 extends StatefulWidget {
 }
 
 class _Prac5State extends State<Prac5> {
-  late Database database;
+  Database? database;
   List<Map<String, dynamic>> students = [];
   final TextEditingController nameController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
@@ -19,8 +18,6 @@ class _Prac5State extends State<Prac5> {
   @override
   void initState() {
     super.initState();
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
     initDatabase();
   }
 
@@ -29,7 +26,7 @@ class _Prac5State extends State<Prac5> {
       join(await getDatabasesPath(), 'student_records.db'),
       onCreate: (db, version) {
         return db.execute(
-          'CREATE TABLE students(id INTEGER PRIMARY KEY, name TEXT, age INTEGER)',
+          'CREATE TABLE students(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INTEGER)',
         );
       },
       version: 1,
@@ -38,14 +35,16 @@ class _Prac5State extends State<Prac5> {
   }
 
   Future<void> fetchStudents() async {
-    final List<Map<String, dynamic>> data = await database.query('students');
+    if (database == null) return;
+    final List<Map<String, dynamic>> data = await database!.query('students');
     setState(() {
       students = data;
     });
   }
 
   Future<void> addStudent(String name, int age) async {
-    await database.insert(
+    if (database == null) return;
+    await database!.insert(
       'students',
       {'name': name, 'age': age},
       conflictAlgorithm: ConflictAlgorithm.replace,
@@ -54,7 +53,8 @@ class _Prac5State extends State<Prac5> {
   }
 
   Future<void> updateStudent(int id, String name, int age) async {
-    await database.update(
+    if (database == null) return;
+    await database!.update(
       'students',
       {'name': name, 'age': age},
       where: 'id = ?',
@@ -64,7 +64,8 @@ class _Prac5State extends State<Prac5> {
   }
 
   Future<void> deleteStudent(int id) async {
-    await database.delete(
+    if (database == null) return;
+    await database!.delete(
       'students',
       where: 'id = ?',
       whereArgs: [id],
@@ -77,7 +78,7 @@ class _Prac5State extends State<Prac5> {
     ageController.text = currentAge.toString();
 
     showDialog(
-      context: context,
+      context: this.context, // Fixed the context issue
       builder: (context) {
         return AlertDialog(
           title: Text('Update Student'),
@@ -105,21 +106,17 @@ class _Prac5State extends State<Prac5> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.of(context).pop();
               },
               child: Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () {
-                String name = nameController.text;
-                String ageText = ageController.text;
-                if (name.isNotEmpty && int.tryParse(ageText) != null) {
-                  updateStudent(id, name, int.parse(ageText));
-                  Navigator.pop(context);
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Invalid name or age')),
-                  );
+                if (nameController.text.isNotEmpty && ageController.text.isNotEmpty) {
+                  updateStudent(id, nameController.text, int.tryParse(ageController.text) ?? 0);
+                  nameController.clear();
+                  ageController.clear();
+                  Navigator.of(context).pop();
                 }
               },
               child: Text('Update'),
@@ -161,7 +158,7 @@ class _Prac5State extends State<Prac5> {
             ElevatedButton(
               onPressed: () {
                 if (nameController.text.isNotEmpty && ageController.text.isNotEmpty) {
-                  addStudent(nameController.text, int.parse(ageController.text));
+                  addStudent(nameController.text, int.tryParse(ageController.text) ?? 0);
                   nameController.clear();
                   ageController.clear();
                 }
@@ -177,16 +174,16 @@ class _Prac5State extends State<Prac5> {
                     elevation: 4,
                     margin: EdgeInsets.symmetric(vertical: 8),
                     child: ListTile(
-                      title: Text(students[index]['name']),
-                      subtitle: Text('Age: ${students[index]['age']}'),
+                      title: Text(students[index]['name'] ?? ''),
+                      subtitle: Text('Age: ${students[index]['age'] ?? ''}'),
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => deleteStudent(students[index]['id']),
+                      ),
                       onLongPress: () => showUpdateDialog(
                         students[index]['id'],
                         students[index]['name'],
                         students[index]['age'],
-                      ),
-                      trailing: IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => deleteStudent(students[index]['id']),
                       ),
                     ),
                   );
@@ -199,9 +196,3 @@ class _Prac5State extends State<Prac5> {
     );
   }
 }
-
-
-
-
-
-
