@@ -10,7 +10,8 @@ class Prac2 extends StatefulWidget {
 class _Prac2State extends State<Prac2> {
   final TextEditingController _controller = TextEditingController();
   String _result = '';
-  String _selectedConversion = 'Fahrenheit';
+  String _from = 'Celsius';
+  String _to = 'Fahrenheit';
 
   
 
@@ -29,25 +30,37 @@ class _Prac2State extends State<Prac2> {
             TextField(
               controller: _controller,
               decoration: InputDecoration(
-                labelText: 'Enter temperature in Celsius',
+                labelText: 'Enter value',
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.number,
             ),
             SizedBox(height: 20),
-            DropdownButton<String>(
-              value: _selectedConversion,
-              items: ['Fahrenheit', 'Kelvin', 'Celsius']
-                  .map((conversion) => DropdownMenuItem(
-                        value: conversion,
-                        child: Text(conversion),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedConversion = value!;
-                });
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: _from,
+                    decoration: const InputDecoration(labelText: 'From', border: OutlineInputBorder()),
+                    items: const ['Celsius', 'Fahrenheit', 'Kelvin']
+                        .map((u) => DropdownMenuItem(value: u, child: Text(u)))
+                        .toList(),
+                    onChanged: (v) => setState(() => _from = v!),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: _to,
+                    decoration: const InputDecoration(labelText: 'To', border: OutlineInputBorder()),
+                    items: const ['Celsius', 'Fahrenheit', 'Kelvin']
+                        .map((u) => DropdownMenuItem(value: u, child: Text(u)))
+                        .toList(),
+                    onChanged: (v) => setState(() => _to = v!),
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -70,24 +83,42 @@ class _Prac2State extends State<Prac2> {
     );
   }
   void _convertTemperature() {
-    double? input = double.tryParse(_controller.text);
-    if (input != null) {
-      setState(() {
-        if (_selectedConversion == 'Fahrenheit') {
-          double fahrenheit = (input * 9 / 5) + 32;
-          _result = '$input°C = ${fahrenheit.toStringAsFixed(2)}°F';
-        } else if (_selectedConversion == 'Kelvin') {
-          double kelvin = input + 273.15;
-          _result = '$input°C = ${kelvin.toStringAsFixed(2)}K';
-        } else {
-          _result = '$input°C = $input°C';
-        }
-      });
-    } else {
-      setState(() {
-        _result = 'Invalid input';
-      });
+    final input = double.tryParse(_controller.text.trim());
+    if (input == null) {
+      setState(() => _result = 'Please enter a valid number');
+      return;
     }
+
+    double inCelsius;
+    // Convert input to Celsius
+    switch (_from) {
+      case 'Fahrenheit':
+        inCelsius = (input - 32) * 5 / 9;
+        break;
+      case 'Kelvin':
+        inCelsius = input - 273.15;
+        break;
+      default:
+        inCelsius = input;
+    }
+
+    double out;
+    String unitSuffix;
+    switch (_to) {
+      case 'Fahrenheit':
+        out = (inCelsius * 9 / 5) + 32;
+        unitSuffix = '°F';
+        break;
+      case 'Kelvin':
+        out = inCelsius + 273.15;
+        unitSuffix = 'K';
+        break;
+      default:
+        out = inCelsius;
+        unitSuffix = '°C';
+    }
+
+    setState(() => _result = '${input.toStringAsFixed(2)} $_from = ${out.toStringAsFixed(2)} $unitSuffix');
   }
 }
 

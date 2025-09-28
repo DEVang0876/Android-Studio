@@ -12,6 +12,9 @@ class _Prac4State extends State<Prac4> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  bool _hidePwd = true;
+  bool _hideConfirm = true;
 
   
 
@@ -63,13 +66,39 @@ class _Prac4State extends State<Prac4> {
                 decoration: InputDecoration(
                   labelText: 'Password',
                   border: OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(_hidePwd ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () => setState(() => _hidePwd = !_hidePwd),
+                  ),
                 ),
-                obscureText: true,
+                obscureText: _hidePwd,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your password';
                   } else if (value.length < 6) {
                     return 'Password must be at least 6 characters';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                controller: _confirmPasswordController,
+                decoration: InputDecoration(
+                  labelText: 'Confirm Password',
+                  border: OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(_hideConfirm ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () => setState(() => _hideConfirm = !_hideConfirm),
+                  ),
+                ),
+                obscureText: _hideConfirm,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please confirm your password';
+                  }
+                  if (value != _passwordController.text) {
+                    return 'Passwords do not match';
                   }
                   return null;
                 },
@@ -92,8 +121,15 @@ class _Prac4State extends State<Prac4> {
   }
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Form Submitted Successfully!')),
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Success'),
+          content: Text('Welcome, ${_nameController.text}!\nEmail: ${_emailController.text}'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK')),
+          ],
+        ),
       );
     }
   }

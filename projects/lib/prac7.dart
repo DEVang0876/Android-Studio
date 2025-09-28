@@ -17,18 +17,45 @@ class Prac7 extends StatelessWidget {
             crossAxisCount: 2,
             crossAxisSpacing: 8.0,
             mainAxisSpacing: 8.0,
+            childAspectRatio: 0.82,
           ),
           itemCount: 6,
           itemBuilder: (context, index) {
+            final assetPath = 'assets/product${index + 1}.jpeg';
             return Card(
               elevation: 4,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                    child: Image.asset(
-                      'assets/image${index + 1}.jpeg',
-                      fit: BoxFit.cover,
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(4),
+                        topRight: Radius.circular(4),
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => Dialog(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Image.asset(assetPath, fit: BoxFit.cover),
+                                  Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Text('Product ${index + 1}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                        child: Image.asset(
+                          assetPath,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
                   ),
                   Padding(
@@ -42,6 +69,13 @@ class Prac7 extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: FilledButton(
+                      onPressed: () {},
+                      child: const Text('Add'),
+                    ),
+                  )
                 ],
               ),
             );
