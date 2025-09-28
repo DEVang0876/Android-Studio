@@ -18,6 +18,7 @@ class _Prac10State  extends State<Prac10>
       ),body:
     Column(
       children: [
+        Text("Build APK", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),)
       ],
     ),
 
