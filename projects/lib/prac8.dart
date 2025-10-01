@@ -6,7 +6,7 @@ class Prac8 extends StatelessWidget {
   const Prac8({super.key});
 
   static final Uri _url = Uri.parse(
-    'https://newsapi.org/v2/everything?q=tesla&from=2025-08-28&sortBy=publishedAt&apiKey=6c56e0739b844b1c8848d7e6a6a99343',
+    'https://newsapi.org/v2/everything?q=tesla&from=2025-09-01&sortBy=publishedAt&apiKey=6c56e0739b844b1c8848d7e6a6a99343',
   );
 
   Future<List<_Article>> _fetch() async {
